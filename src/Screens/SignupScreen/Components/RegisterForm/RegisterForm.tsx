@@ -38,7 +38,7 @@ const RegisterForm: React.FunctionComponent = () => {
 
   const handleImageUpload = async () => {
     if (file) {
-      const blobServiceClient = new BlobServiceClient(`https://reactmultistep.blob.core.windows.net/?sv=2022-11-02&ss=b&srt=sco&sp=rwlaciytfx&se=2024-11-10T12:33:41Z&st=2024-11-08T04:33:41Z&spr=https,http&sig=bkbBxjLZVr1%2Fhj47vXvhCBPug2GE1Pv16DlQ44%2B4QlY%3D`);
+      const blobServiceClient = new BlobServiceClient(`https://reactmultistep.blob.core.windows.net/reactmultistepteste?sp=racwdli&st=2024-11-08T05:01:22Z&se=2024-11-08T13:01:22Z&spr=https&sv=2022-11-02&sr=c&sig=wdRD3I0dyz8rQkRCXK9PBSvuCpjwtMOXfZSJOPRoC%2B4%3D`);
       const containerClient = blobServiceClient.getContainerClient("reactmultistep");
       const blobClient = containerClient.getBlobClient(file.name);
       const blockBlobClient = blobClient.getBlockBlobClient();
