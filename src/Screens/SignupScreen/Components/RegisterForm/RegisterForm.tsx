@@ -1,4 +1,5 @@
 import React from "react";
+import { BlobServiceClient } from "@azure/storage-blob";
 import * as yup from "yup";
 import { Box, Button, Divider, useTheme } from "@mui/material";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
@@ -28,6 +29,27 @@ const RegisterForm: React.FunctionComponent = () => {
   const { moveBack, moveNext } = React.useContext(StepperContext);
   const { showNotification } = React.useContext(NotificationContext);
   const { signup } = useAuthentication();
+
+  const [file, setFile] = React.useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(event.target.files ? event.target.files[0] : null);
+  };
+
+  const handleImageUpload = async () => {
+    if (file) {
+      const blobServiceClient = new BlobServiceClient(`https://reactmultistep.blob.core.windows.net/?sv=2022-11-02&ss=b&srt=sco&sp=rwlaciytfx&se=2024-11-10T12:33:41Z&st=2024-11-08T04:33:41Z&spr=https,http&sig=bkbBxjLZVr1%2Fhj47vXvhCBPug2GE1Pv16DlQ44%2B4QlY%3D`);
+      const containerClient = blobServiceClient.getContainerClient("reactmultistep");
+      const blobClient = containerClient.getBlobClient(file.name);
+      const blockBlobClient = blobClient.getBlockBlobClient();
+      const result = await blockBlobClient.uploadData(file, {
+        blockSize: 4 * 1024 * 1024,
+        concurrency: 20,
+        onProgress: ev => console.log(ev)
+      });
+      console.log(`Upload of file '${file.name}' completed`, result);
+    }
+  };
 
   const initialValues: FormValues = React.useMemo(
     () => ({
@@ -73,6 +95,13 @@ const RegisterForm: React.FunctionComponent = () => {
             <FormTextField name='email' placeholder='E.g. john.smith@example.com' label='Email' />
             <FormTextField name='lastname' placeholder='E.g. Smith' label='Last name' />
             <FormTextField name='password' label='Password' type='password' />
+            <input type="file" onChange={handleFileChange} />
+            {!!file && (
+              <>
+                <img src={URL.createObjectURL(file)} alt="file" />
+                <button onClick={handleImageUpload}>Confirm</button>
+              </>
+            )}
           </Box>
           <Divider />
           <Box sx={{ padding: theme.spacing(3, 4), display: "flex", justifyContent: "space-between" }}>
